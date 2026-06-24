@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EXCAVACIÓN — De los Mimikyu a los bloques</title>
+  <meta name="description" content="Mimikyu y Minecraft, capa sobre capa.">
+
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎭</text></svg>" type="image/svg+xml">
+
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;500;700&family=Archivo+Black&display=swap">
+
+  <style>
+    /* ===========================================================
+   EXCAVACIÓN — Prehistoria × Minecraft
+   Color  — carbón #1C1812, hueso #E8DCC0, terracota #C9763C,
+            verde bloque #6B9B47, ámbar resina #D9A33E, tierra #8B5A3C
+   Tipo   — Archivo Black (display fósil) / Space Grotesk (cuerpo) /
+            JetBrains Mono (datos, etiquetas, todo lo "bloque")
+   =========================================================== */
+
+    :root {
+      --carbon: #1C1812;
+      --carbon-soft: #241F18;
+      --bone: #E8DCC0;
+      --bone-dim: #C9BC9C;
+      --terracotta: #C9763C;
+      --terracotta-deep: #9C5429;
+      --block-green: #6B9B47;
+      --block-green-deep: #4A7030;
+      --resin: #D9A33E;
+      --earth: #8B5A3C;
+
+      --font-display: 'Archivo Black', 'Space Grotesk', sans-serif;
+      --font-body: 'Space Grotesk', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+
+      --side-rule-width: 88px;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background: var(--carbon);
+      color: var(--bone);
+      font-family: var(--font-body);
+      line-height: 1.5;
+      overflow-x: hidden;
+    }
+
+    img,
+    svg {
+      display: block;
+      max-width: 100%;
+    }
+
+    h1,
+    h2,
+    h3 {
+      font-family: var(--font-display);
+      line-height: 1.05;
+      letter-spacing: -0.01em;
+    }
+
+    p {
+      max-width: 38em;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    ::selection {
+      background: var(--terracotta);
+      color: var(--carbon);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.001ms !important;
+        transition-duration: 0.001ms !important;
+      }
+    }
+
+    /* =================== REGLA DE EXCAVACIÓN (nav lateral) =================== */
+
+    .depth-rule {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      width: var(--side-rule-width);
+      background: linear-gradient(180deg, var(--carbon-soft), var(--carbon));
+      border-right: 1px solid rgba(232, 220, 192, 0.12);
+      z-index: 100;
+      display: none;
+    }
+
+    @media (min-width: 900px) {
+      .depth-rule {
+        display: block;
+      }
+    }
+
+    .depth-rule ol {
+      list-style: none;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-evenly;
+      align-items: center;
+    }
+
+    .depth-rule a {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      writing-mode: vertical-rl;
+      text-orientation: mixed;
+      padding: 10px 0;
+      border-left: 2px solid transparent;
+      transition: border-color 0.2s ease, color 0.2s ease;
+      color: var(--bone-dim);
+    }
+
+    .depth-rule a:hover,
+    .depth-rule a:focus-visible,
+    .depth-rule a.is-active {
+      color: var(--resin);
+      border-left-color: var(--resin);
+    }
+
+    .depth-mark {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+
+    .depth-label {
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      opacity: 0.7;
+    }
+
+    /* =================== LAYOUT BASE =================== */
+
+    main {
+      margin-left: 0;
+    }
+
+    @media (min-width: 900px) {
+      main {
+        margin-left: var(--side-rule-width);
+      }
+    }
+
+    section {
+      position: relative;
+    }
+
+    /* =================== HERO =================== */
+
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+      isolation: isolate;
+      background: radial-gradient(ellipse at 70% 30%, #2a2118 0%, var(--carbon) 65%);
+    }
+
+    .hero-art {
+      position: absolute;
+      right: -4%;
+      bottom: -4%;
+      width: min(62vw, 760px);
+      z-index: -1;
+      opacity: 0.95;
+      filter: drop-shadow(0 30px 40px rgba(0, 0, 0, 0.5));
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(100deg, rgba(28, 24, 18, 0.92) 0%, rgba(28, 24, 18, 0.35) 48%, rgba(28, 24, 18, 0.05) 70%);
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    .hero-fossil-crack {
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      background-image:
+        repeating-linear-gradient(115deg, transparent 0 140px, rgba(217, 163, 62, 0.06) 140px 142px);
+      pointer-events: none;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      padding: 0 6vw;
+      max-width: 1100px;
+    }
+
+    .eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      letter-spacing: 0.18em;
+      color: var(--resin);
+      margin-bottom: 1.5rem;
+    }
+
+    .hero h1 {
+      font-size: clamp(2.6rem, 8vw, 6rem);
+      margin-bottom: 1.5rem;
+    }
+
+    .text-fossil {
+      color: var(--terracotta);
+    }
+
+    .text-block {
+      color: var(--block-green);
+    }
+
+    .hero-sub {
+      font-size: clamp(1rem, 1.6vw, 1.25rem);
+      color: var(--bone-dim);
+      margin-bottom: 2.5rem;
+    }
+
+    .btn-dig {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      background: var(--terracotta);
+      color: var(--carbon);
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 0.95rem;
+      letter-spacing: 0.03em;
+      padding: 0.9rem 1.6rem;
+      border-radius: 4px;
+      transition: transform 0.2s ease, background 0.2s ease;
+    }
+
+    .btn-dig:hover,
+    .btn-dig:focus-visible {
+      background: var(--resin);
+      transform: translateY(-2px);
+    }
+
+    .pickaxe {
+      display: inline-block;
+      transform: rotate(-15deg);
+    }
+
+    .scroll-hint {
+      position: absolute;
+      bottom: 2.5rem;
+      left: 6vw;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      z-index: 1;
+    }
+
+    .scroll-hint span {
+      width: 18px;
+      height: 2px;
+      background: var(--bone-dim);
+      opacity: 0.4;
+      animation: digPulse 1.8s ease-in-out infinite;
+    }
+
+    .scroll-hint span:nth-child(2) {
+      animation-delay: 0.2s;
+      width: 12px;
+    }
+
+    .scroll-hint span:nth-child(3) {
+      animation-delay: 0.4s;
+      width: 7px;
+    }
+
+    @keyframes digPulse {
+
+      0%,
+      100% {
+        opacity: 0.25;
+      }
+
+      50% {
+        opacity: 0.8;
+      }
+    }
+
+    /* =================== CAPAS GENÉRICAS =================== */
+
+    .layer {
+      padding: clamp(4rem, 10vh, 7rem) 6vw;
+      background: var(--carbon);
+    }
+
+    .layer--cretacico {
+      background: linear-gradient(180deg, var(--carbon) 0%, #221A14 100%);
+    }
+
+    .layer--triasico {
+      background: linear-gradient(180deg, #221A14 0%, #1E2014 100%);
+    }
+
+    .layer--bioma {
+      background: linear-gradient(180deg, #14201A 0%, #16241C 100%);
+    }
+
+    .layer-strata {
+      margin-bottom: 2.5rem;
+    }
+
+    .strata-tag {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.16em;
+      color: var(--earth);
+      border: 1px solid var(--earth);
+      padding: 0.3rem 0.7rem;
+      border-radius: 3px;
+    }
+
+    .strata-tag--block {
+      color: var(--block-green);
+      border-color: var(--block-green);
+    }
+
+    .layer-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 3rem;
+      align-items: center;
+      max-width: 1300px;
+      margin: 0 auto;
+    }
+
+    @media (min-width: 800px) {
+      .layer-grid {
+        grid-template-columns: 1fr 1.1fr;
+      }
+
+      .layer-grid--reverse .layer-copy {
+        order: 2;
+      }
+
+      .layer-grid--reverse .layer-media {
+        order: 1;
+      }
+    }
+
+    .layer-number {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: var(--terracotta);
+      margin-bottom: 1rem;
+      letter-spacing: 0.05em;
+    }
+
+    .layer-number--block {
+      color: var(--block-green);
+    }
+
+    .layer-copy h2 {
+      font-size: clamp(1.9rem, 4vw, 3rem);
+      margin-bottom: 1.3rem;
+    }
+
+    .layer-copy p {
+      color: var(--bone-dim);
+      font-size: 1.05rem;
+      margin-bottom: 1.8rem;
+    }
+
+    .layer-copy strong {
+      color: var(--bone);
+    }
+
+    .layer-copy em {
+      color: var(--resin);
+      font-style: normal;
+    }
+
+    /* Tiras de datos tipo "HUD" */
+
+    .fact-strip {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.8rem;
+      list-style: none;
+      border-top: 1px solid rgba(232, 220, 192, 0.15);
+      padding-top: 1.4rem;
+    }
+
+    .fact-num {
+      display: block;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 1.4rem;
+      color: var(--terracotta);
+    }
+
+    .fact-strip--block .fact-num {
+      color: var(--block-green);
+    }
+
+    .fact-label {
+      display: block;
+      font-size: 0.75rem;
+      color: var(--bone-dim);
+      margin-top: 0.2rem;
+      max-width: 12em;
+    }
+
+    /* Mini timeline (Triásico) */
+
+    .timeline-mini {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      border-top: 1px solid rgba(232, 220, 192, 0.15);
+      padding-top: 1.4rem;
+    }
+
+    .tl-point {
+      font-size: 0.8rem;
+      color: var(--bone-dim);
+    }
+
+    .tl-point span {
+      display: block;
+      font-family: var(--font-mono);
+      color: var(--resin);
+      font-weight: 700;
+      font-size: 0.95rem;
+      margin-bottom: 0.2rem;
+    }
+
+    /* Marcos de ilustración */
+
+    .fossil-frame {
+      position: relative;
+      border-radius: 6px;
+      overflow: hidden;
+      border: 1px solid rgba(232, 220, 192, 0.15);
+      background: #18130e;
+    }
+
+    .fossil-frame svg {
+      width: 100%;
+      height: auto;
+    }
+
+    .fossil-frame--block {
+      border-radius: 0;
+      border: 4px solid var(--block-green-deep);
+    }
+
+    .fossil-frame figcaption {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.04em;
+      color: var(--bone-dim);
+      padding: 0.7rem 1rem;
+      background: rgba(0, 0, 0, 0.2);
+    }
+
+    /* =================== TRANSICIÓN / PIEZA FIRMA =================== */
+
+    .strata-transition {
+      padding: clamp(5rem, 14vh, 9rem) 6vw;
+      background: #18140F;
+      text-align: center;
+      overflow: hidden;
+    }
+
+    .strata-transition__inner {
+      max-width: 760px;
+      margin: 0 auto;
+    }
+
+    .strata-tag--center {
+      display: inline-block;
+      margin-bottom: 1.5rem;
+    }
+
+    .strata-transition h2 {
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      margin-bottom: 1.3rem;
+    }
+
+    .strata-transition p {
+      color: var(--bone-dim);
+      margin: 0 auto 3.5rem;
+      font-size: 1.05rem;
+    }
+
+    .strata-art {
+      position: relative;
+      height: 180px;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid rgba(232, 220, 192, 0.15);
+    }
+
+    .strata-rock {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 55%;
+      background:
+        repeating-linear-gradient(100deg, var(--earth) 0 18px, var(--terracotta-deep) 18px 36px),
+        var(--earth);
+      background-blend-mode: multiply;
+      opacity: 0.9;
+    }
+
+    .strata-seam {
+      position: absolute;
+      top: 55%;
+      left: 0;
+      right: 0;
+      height: 6px;
+      background: var(--resin);
+      box-shadow: 0 0 16px 2px rgba(217, 163, 62, 0.6);
+    }
+
+    .strata-blocks {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      top: calc(55% + 6px);
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      gap: 3px;
+      padding: 3px;
+    }
+
+    .strata-blocks span {
+      background: var(--block-green);
+      border: 2px solid var(--block-green-deep);
+    }
+
+    .strata-blocks span:nth-child(3n) {
+      background: var(--earth);
+      border-color: #5c3c28;
+    }
+
+    .strata-blocks span:nth-child(5n) {
+      background: var(--bone-dim);
+      border-color: #9c916f;
+    }
+
+    /* =================== CRAFTEO =================== */
+
+    .craft {
+      padding: clamp(4rem, 10vh, 7rem) 6vw;
+      background: linear-gradient(180deg, #16241C 0%, var(--carbon) 100%);
+    }
+
+    .craft-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .craft h2 {
+      font-size: clamp(2rem, 5vw, 3rem);
+      margin: 1rem 0 0.6rem;
+    }
+
+    .craft-sub {
+      color: var(--bone-dim);
+      margin: 0 auto 3rem;
+    }
+
+    .crafting-table {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 4rem;
+    }
+
+    .craft-slot {
+      width: 110px;
+      height: 110px;
+      background: var(--carbon-soft);
+      border: 3px solid var(--earth);
+      border-radius: 6px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+    }
+
+    .craft-slot--result {
+      border-color: var(--resin);
+      box-shadow: 0 0 24px 4px rgba(217, 163, 62, 0.3);
+    }
+
+    .craft-emoji {
+      font-size: 2.2rem;
+    }
+
+    .craft-name {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      color: var(--bone-dim);
+      text-align: center;
+    }
+
+    .craft-plus,
+    .craft-arrow {
+      font-family: var(--font-mono);
+      font-size: 1.6rem;
+      color: var(--bone-dim);
+    }
+
+    .craft-cards {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+      text-align: left;
+    }
+
+    @media (min-width: 760px) {
+      .craft-cards {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    .craft-card {
+      background: var(--carbon-soft);
+      border: 1px solid rgba(232, 220, 192, 0.12);
+      border-radius: 8px;
+      padding: 1.8rem;
+    }
+
+    .craft-card-icon {
+      font-size: 1.8rem;
+      display: block;
+      margin-bottom: 0.8rem;
+    }
+
+    .craft-card h3 {
+      font-family: var(--font-mono);
+      font-size: 1rem;
+      letter-spacing: 0.04em;
+      margin-bottom: 0.6rem;
+      color: var(--resin);
+    }
+
+    .craft-card p {
+      font-size: 0.9rem;
+      color: var(--bone-dim);
+    }
+
+    /* =================== FOOTER =================== */
+
+    .site-footer {
+      padding: 2.5rem 6vw;
+      text-align: center;
+      background: var(--carbon);
+      border-top: 1px solid rgba(232, 220, 192, 0.1);
+    }
+
+    @media (min-width: 900px) {
+      .site-footer {
+        margin-left: var(--side-rule-width);
+      }
+    }
+
+    .site-footer p {
+      margin: 0 auto;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.03em;
+      color: var(--bone-dim);
+      opacity: 0.6;
+    }
+
+    /* =================== FOCUS VISIBLE GLOBAL =================== */
+
+    a:focus-visible,
+    button:focus-visible {
+      outline: 2px solid var(--resin);
+      outline-offset: 3px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <nav class="depth-rule" aria-label="Navegación por capas">
+    <ol>
+      <li><a href="#superficie"><span class="depth-mark">0 m</span><span class="depth-label">Superficie</span></a></li>
+      <li><a href="#cretacico"><span class="depth-mark">66 Ma</span><span class="depth-label">Cretácico</span></a></li>
+      <li><a href="#triasico"><span class="depth-mark">230 Ma</span><span class="depth-label">Triásico</span></a></li>
+      <li><a href="#estrato"><span class="depth-mark">y=0</span><span class="depth-label">El Estrato</span></a></li>
+      <li><a href="#bioma"><span class="depth-mark">y=64</span><span class="depth-label">Bioma</span></a></li>
+      <li><a href="#crafteo"><span class="depth-mark">y=80</span><span class="depth-label">Crafteo</span></a></li>
+    </ol>
+  </nav>
+
+  <main>
+
+    <!-- ============ HERO ============ -->
+    <section class="hero" id="superficie">
+      <div class="hero-fossil-crack" aria-hidden="true"></div>
+
+      <!-- Ilustración Mimikyu hero -->
+      <svg xmlns="http://www.w3.org/2000/svg" aria-label="Mimikyu con disfraz amarillo en el hero" class="hero-art" viewBox="0 0 400 500"><ellipse cx="200" cy="470" opacity=".3" rx="90" ry="18"/><rect width="220" height="230" x="90" y="200" fill="#d9a33e" rx="18"/><path fill="#b8852a" d="M90 220h220v6H90z" opacity=".4"/><path fill="#b8852a" d="M90 250h220v4H90z" opacity=".3"/><path fill="#b8852a" d="M90 278h220v5H90z" opacity=".35"/><path fill="#b8852a" d="M90 308h220v4H90z" opacity=".3"/><path fill="#c4892e" d="m90 430 30-12 30 14 30-12 30 15 30-17 30 12 30-15 10 15z"/><ellipse cx="200" cy="195" fill="#d9a33e" rx="110" ry="100"/><path fill="#d9a33e" d="M110 120 85 30l60 65z"/><path fill="#c4892e" d="M110 120 90 45l50 53z" opacity=".5"/><path fill="#d9a33e" d="m290 120 25-90-60 65z"/><path fill="#c4892e" d="m290 120 20-75-50 53z" opacity=".5"/><circle cx="160" cy="195" r="22" fill="#1c1812"/><circle cx="240" cy="195" r="22" fill="#1c1812"/><circle cx="160" cy="195" r="10" fill="#fff" opacity=".15"/><circle cx="240" cy="195" r="10" fill="#fff" opacity=".15"/><path fill="none" stroke="#1c1812" stroke-linecap="round" stroke-width="4" d="M170 225q30 20 60 0"/><ellipse cx="200" cy="415" fill="#1c1812" opacity=".4" rx="60" ry="12"/><ellipse cx="310" cy="390" fill="#2a2018" rx="18" ry="10" transform="rotate(-20 310 390)"/><ellipse cx="325" cy="380" fill="#1c1812" rx="10" ry="7" transform="rotate(-30 325 380)"/></svg>
+
+      <div class="hero-content">
+        <p class="eyebrow">PROYECTO DE EXCAVACIÓN Nº 17 — REGISTRO ABIERTO</p>
+        <h1>De los <span class="text-fossil">Mimikyu</span><br>a los <span class="text-block">bloques</span>.</h1>
+        <p class="hero-sub">66 millones de años separan al Mimikyu del primer creeper. Esta web excava entre
+          ambos: una capa de roca prehistórica y, justo debajo, una capa de voxels. Baja para atravesarla.</p>
+        <a class="btn-dig" href="#cretacico">
+          <span class="pickaxe" aria-hidden="true">⛏</span> Empezar a excavar
+        </a>
+      </div>
+
+      <div class="scroll-hint" aria-hidden="true">
+        <span></span><span></span><span></span>
+      </div>
+    </section>
+
+    <!-- ============ CAPA CRETÁCICO ============ -->
+    <section class="layer layer--cretacico" id="cretacico">
+      <div class="layer-strata" aria-hidden="true">
+        <span class="strata-tag">ESTRATO 01</span>
+      </div>
+
+      <div class="layer-grid">
+        <div class="layer-media">
+          <figure class="fossil-frame">
+            <!-- Ilustración: Mimikyu fósil color hueso/terracota -->
+            <svg xmlns="http://www.w3.org/2000/svg" aria-label="Mimikyu con disfraz color hueso fósil sobre cuadrícula de excavación arqueológica" viewBox="0 0 800 600"><path fill="#2b2018" d="M0 0h800v600H0z"/><path fill="#33271c" d="M0 120h800v120H0z"/><path fill="#3a2c1f" d="M0 240h800v120H0z"/><path fill="#412f21" d="M0 360h800v120H0z"/><path fill="#473322" d="M0 480h800v120H0z"/><g stroke="#d9a33e" stroke-width="1.5" opacity=".35"><path d="M200 0v600M400 0v600M600 0v600M0 200h800M0 400h800"/></g><rect width="200" height="190" x="270" y="310" fill="#e8dcc0" rx="14"/><path fill="#b8a888" d="M270 328h200v5H270z" opacity=".5"/><path fill="#b8a888" d="M270 350h200v4H270z" opacity=".4"/><path fill="#b8a888" d="M270 372h200v4H270z" opacity=".35"/><path fill="#c9763c" d="m270 500 25-10 25 12 30-14 30 12 30-12 30 12 20-10 10 10z"/><ellipse cx="370" cy="305" fill="#e8dcc0" rx="100" ry="90"/><path fill="#e8dcc0" d="m295 250-25-80 60 65z"/><path fill="#c9bc9c" d="m295 250-20-70 50 58z" opacity=".5"/><path fill="#e8dcc0" d="m445 250 25-80-60 65z"/><path fill="#c9bc9c" d="m445 250 20-70-50 58z" opacity=".5"/><circle cx="340" cy="305" r="20" fill="#221a14"/><circle cx="400" cy="305" r="20" fill="#221a14"/><circle cx="340" cy="300" r="8" fill="#fff" opacity=".12"/><circle cx="400" cy="300" r="8" fill="#fff" opacity=".12"/><path fill="none" stroke="#221a14" stroke-linecap="round" stroke-width="3.5" d="M348 328q22 17 44 0"/><ellipse cx="475" cy="460" fill="#2a1e12" rx="16" ry="9" transform="rotate(-15 475 460)"/><ellipse cx="488" cy="450" fill="#1c1812" rx="9" ry="6" transform="rotate(-25 488 450)"/><g transform="rotate(-25 1450.23 -1098.213)"><rect width="90" height="10" fill="#8b5a3c" rx="3"/><rect width="22" height="22" x="85" y="-6" fill="#c9bc9c" rx="2"/></g></svg>
+            <figcaption>ESPÉCIMEN 5027 — Mimikyu hallado en estrato de grano fino, Cretácico Superior</figcaption>
+          </figure>
+        </div>
+
+        <div class="layer-copy">
+          <span class="layer-number">01</span>
+          <h2>El Cretácico<br>no era verde césped.</h2>
+          <p>Hace 66 millones de años, esta capa de roca era barro. Un Mimikyu habita en los rincones más oscuros y
+            misteriosos, ocultando su verdadera forma bajo un disfraz cosido a mano. Sus secretos, hoy, siguen siendo
+            piedra: nadie ha visto nunca su cuerpo real, un proceso de ocultamiento que lleva generaciones y que llamamos <strong>mimetismo</strong>.</p>
+          <ul class="fact-strip">
+            <li><span class="fact-num">Tipo 4</span><span class="fact-label">Fantasma / Hada</span></li>
+            <li><span class="fact-num">0.2&nbsp;m</span><span class="fact-label">Altura con disfraz</span></li>
+            <li><span class="fact-num">???</span><span class="fact-label">Años de misterio</span></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ CAPA TRIÁSICO ============ -->
+    <section class="layer layer--triasico" id="triasico">
+      <div class="layer-strata" aria-hidden="true">
+        <span class="strata-tag">ESTRATO 02</span>
+      </div>
+
+      <div class="layer-grid layer-grid--reverse">
+        <div class="layer-copy">
+          <span class="layer-number">02</span>
+          <h2>Antes de los disfraces,<br>hubo ensayo y error.</h2>
+          <p>El Triásico es donde empieza todo: Mimikyus del tamaño de un guante, compitiendo por parecerse a algo que
+            nadie recuerda ya. La mayoría de esos intentos no llegó al Jurásico. La evolución no diseña al imitador desde el
+            principio; lo encuentra a base de descartar lo que no sirve, capa a capa, como quien excava sin saber qué
+            hay debajo.</p>
+          <div class="timeline-mini">
+            <div class="tl-point"><span>252 Ma</span>Inicio del Triásico</div>
+            <div class="tl-point"><span>201 Ma</span>Fin del Triásico</div>
+            <div class="tl-point"><span>145 Ma</span>Apogeo del Jurásico</div>
+          </div>
+        </div>
+
+        <div class="layer-media">
+          <figure class="fossil-frame fossil-frame--tall">
+            <!-- Ilustración: corte estratigráfico con Mimikyus verde oscuro del Triásico -->
+            <svg xmlns="http://www.w3.org/2000/svg" aria-label="Corte transversal de estratos geológicos ondulados con Mimikyus del Triásico en tonos verdes oscuros" viewBox="0 0 800 600"><path fill="#241f17" d="M0 0h800v600H0z"/><path fill="#2c2519" d="M0 80q200-20 400 5 200 20 400-10v65q-200 25-400 10-200-20-400 0Z"/><path fill="#352c1e" d="M0 150q200-20 400 0 200 15 400-10v90q-200 20-400 5T0 240Z"/><path fill="#3e3221" d="M0 240q200-20 400-5t400-5v110q-200 20-400 5T0 350Z"/><path fill="#473823" d="M0 350q200-20 400-5t400-5v120q-200 20-400 5-200-17-400 5Z"/><path fill="#503e25" d="M0 470q200-22 400-5 200 15 400-5v140H0Z"/><g transform="translate(100 290)"><rect width="110" height="100" y="60" fill="#1a2e1a" rx="8"/><path fill="#0f1f0f" d="M0 70h110v3H0z" opacity=".5"/><path fill="#0f1f0f" d="M0 82h110v3H0z" opacity=".4"/><path fill="#142814" d="m0 160 18-8 18 10 20-12 20 10 20-10 14 8v2z"/><ellipse cx="55" cy="55" fill="#1a2e1a" rx="55" ry="50"/><path fill="#1a2e1a" d="M18 22 5-30l35 45zM92 22l13-52-35 45z"/><circle cx="35" cy="52" r="13" fill="#0a1a0a"/><circle cx="75" cy="52" r="13" fill="#0a1a0a"/><circle cx="35" cy="49" r="5" fill="#4a7030" opacity=".4"/><circle cx="75" cy="49" r="5" fill="#4a7030" opacity=".4"/><path fill="none" stroke="#0a1a0a" stroke-linecap="round" stroke-width="2.5" d="M41 68q14 10 28 0"/><ellipse cx="113" cy="138" fill="#0a140a" rx="10" ry="6" transform="rotate(-15 113 138)"/></g><g transform="matrix(.65 0 0 .65 390 268)"><rect width="110" height="100" y="60" fill="#2d4a20" rx="8"/><path fill="#1e3215" d="M0 70h110v3H0z" opacity=".5"/><path fill="#1e3215" d="M0 82h110v3H0z" opacity=".4"/><path fill="#223818" d="m0 160 18-8 18 10 20-12 20 10 20-10 14 8v2z"/><ellipse cx="55" cy="55" fill="#2d4a20" rx="55" ry="50"/><path fill="#2d4a20" d="M18 22 5-30l35 45zM92 22l13-52-35 45z"/><circle cx="35" cy="52" r="13" fill="#142810"/><circle cx="75" cy="52" r="13" fill="#142810"/><circle cx="35" cy="49" r="5" fill="#6b9b47" opacity=".35"/><circle cx="75" cy="49" r="5" fill="#6b9b47" opacity=".35"/><path fill="none" stroke="#142810" stroke-linecap="round" stroke-width="2.5" d="M41 68q14 10 28 0"/><ellipse cx="113" cy="138" fill="#0f1e0a" rx="10" ry="6" transform="rotate(-15 113 138)"/></g><g transform="matrix(-.8 0 0 .8 600 310)"><rect width="110" height="100" y="60" fill="#1a3028" rx="8"/><path fill="#0f2018" d="M0 70h110v3H0z" opacity=".5"/><path fill="#0f2018" d="M0 82h110v3H0z" opacity=".4"/><path fill="#122820" d="m0 160 18-8 18 10 20-12 20 10 20-10 14 8v2z"/><ellipse cx="55" cy="55" fill="#1a3028" rx="55" ry="50"/><path fill="#1a3028" d="M18 22 5-30l35 45zM92 22l13-52-35 45z"/><circle cx="35" cy="52" r="13" fill="#0a1812"/><circle cx="75" cy="52" r="13" fill="#0a1812"/><circle cx="35" cy="49" r="5" fill="#3a8060" opacity=".35"/><circle cx="75" cy="49" r="5" fill="#3a8060" opacity=".35"/><path fill="none" stroke="#0a1812" stroke-linecap="round" stroke-width="2.5" d="M41 68q14 10 28 0"/><ellipse cx="113" cy="138" fill="#080f0a" rx="10" ry="6" transform="rotate(-15 113 138)"/></g><g fill="#d9a33e" opacity=".55"><path d="M120 500h14v14h-14zM500 520h14v14h-14zM660 495h14v14h-14z"/></g></svg>
+            <figcaption>Corte estratigráfico — cada línea es, aproximadamente, un milenio</figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ TRANSICIÓN / EL ESTRATO (pieza firma) ============ -->
+    <section class="strata-transition" id="estrato">
+      <div class="strata-transition__inner">
+        <span class="strata-tag strata-tag--center">CORTE TRANSVERSAL</span>
+        <h2>Aquí la piedra<br>se convierte en bloques.</h2>
+        <p>No es casualidad. Cualquier minero de Minecraft sabe que se excava hacia abajo para encontrar algo valioso.
+          Los paleontólogos también. La diferencia es que uno usa un pico de diamante y el otro un cepillo de cerdas
+          suaves — y solo uno de los dos puede romper el mundo en cubos perfectos de un metro.</p>
+
+        <div class="strata-art" aria-hidden="true">
+          <div class="strata-rock"></div>
+          <div class="strata-seam"></div>
+          <div class="strata-blocks">
+            <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+            <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ BIOMA (Minecraft) ============ -->
+    <section class="layer layer--bioma" id="bioma">
+      <div class="layer-strata" aria-hidden="true">
+        <span class="strata-tag strata-tag--block">CHUNK 03</span>
+      </div>
+
+      <div class="layer-grid">
+        <div class="layer-media">
+          <figure class="fossil-frame fossil-frame--block">
+            <!-- Ilustración: bioma de Minecraft con corte de subsuelo y minerales -->
+            <svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges" role="img"
+              aria-label="Paisaje de bloques estilo Minecraft con árboles, colinas, y un corte de subsuelo mostrando tierra, piedra y minerales">
+              <rect x="0" y="0" width="800" height="500" fill="#16241C" />
+              <rect x="640" y="40" width="60" height="60" fill="#D9A33E" />
+              <g fill="#2a3a2e">
+                <rect x="80" y="70" width="80" height="20" />
+                <rect x="100" y="50" width="40" height="20" />
+              </g>
+              <g fill="#3a4a36">
+                <rect x="0" y="260" width="40" height="40" />
+                <rect x="40" y="240" width="40" height="60" />
+                <rect x="80" y="220" width="40" height="80" />
+                <rect x="120" y="240" width="40" height="60" />
+                <rect x="600" y="250" width="40" height="50" />
+                <rect x="640" y="230" width="40" height="70" />
+                <rect x="680" y="250" width="40" height="50" />
+                <rect x="720" y="270" width="40" height="30" />
+              </g>
+              <rect x="0" y="300" width="800" height="40" fill="#6B9B47" />
+              <rect x="0" y="340" width="800" height="60" fill="#8B5A3C" />
+              <rect x="0" y="400" width="800" height="100" fill="#5c5650" />
+              <g fill="#D9A33E">
+                <rect x="120" y="430" width="20" height="20" />
+                <rect x="140" y="430" width="20" height="20" />
+                <rect x="500" y="460" width="20" height="20" />
+              </g>
+              <g fill="#6b8ca8">
+                <rect x="650" y="420" width="20" height="20" />
+                <rect x="670" y="440" width="20" height="20" />
+              </g>
+              <rect x="230" y="220" width="20" height="80" fill="#6b4a2f" />
+              <rect x="200" y="160" width="80" height="80" fill="#4a7030" />
+              <rect x="500" y="240" width="20" height="60" fill="#6b4a2f" />
+              <rect x="480" y="190" width="60" height="60" fill="#4a7030" />
+              <rect x="350" y="120" width="36" height="36" fill="#6B9B47" stroke="#4A7030" stroke-width="4" />
+            </svg>
+            <figcaption>BIOMA: Selva — Y=64, luz de cielo 15/15</figcaption>
+          </figure>
+        </div>
+
+        <div class="layer-copy">
+          <span class="layer-number layer-number--block">03</span>
+          <h2>Y entonces, el mundo<br>se vuelve cúbico.</h2>
+          <p>En Minecraft, el terreno se genera por <em>chunks</em> de 16×16 bloques, y la altura se mide en valores de
+            Y. A diferencia del Cretácico, aquí cada capa es exacta, repetible y procedural: el mismo seed siempre
+            genera el mismo mundo. Es la prehistoria con control de versiones.</p>
+          <ul class="fact-strip fact-strip--block">
+            <li><span class="fact-num">16³</span><span class="fact-label">Bloques por chunk</span></li>
+            <li><span class="fact-num">-64 a 320</span><span class="fact-label">Rango de altura (Y)</span></li>
+            <li><span class="fact-num">∞</span><span class="fact-label">Seeds posibles</span></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ CRAFTEO ============ -->
+    <section class="craft" id="crafteo">
+      <div class="craft-inner">
+        <span class="layer-number layer-number--block">04</span>
+        <h2>Mesa de crafteo:<br>Mimikyu + bloque</h2>
+        <p class="craft-sub">La receta que conecta las dos eras de esta web.</p>
+
+        <div class="crafting-table" role="img"
+          aria-label="Receta de crafteo: trapo viejo, más aguja e hilo, más polvo espectral, da como resultado un Mimikyu.">
+          <div class="craft-slot"><span class="craft-emoji">🧣</span><span class="craft-name">Trapo viejo</span></div>
+          <div class="craft-plus">+</div>
+          <div class="craft-slot"><span class="craft-emoji">🪡</span><span class="craft-name">Aguja e hilo</span>
+          </div>
+          <div class="craft-plus">+</div>
+          <div class="craft-slot"><span class="craft-emoji">👻</span><span class="craft-name">Polvo espectral</span>
+          </div>
+          <div class="craft-arrow">→</div>
+          <div class="craft-slot craft-slot--result"><span class="craft-emoji">🎭</span><span
+              class="craft-name">Mimikyu-bloque</span></div>
+        </div>
+
+        <div class="craft-cards">
+          <article class="craft-card">
+            <span class="craft-card-icon">🪨</span>
+            <h3>Estrato</h3>
+            <p>Cada capa de esta web representa una capa de tiempo o de mundo. Scrollear es excavar.</p>
+          </article>
+          <article class="craft-card">
+            <span class="craft-card-icon">🧱</span>
+            <h3>Bloque</h3>
+            <p>Toda la tipografía de datos usa una fuente monoespaciada: cada carácter ocupa una celda, como un bloque
+              en su chunk.</p>
+          </article>
+          <article class="craft-card">
+            <span class="craft-card-icon">🎭</span>
+            <h3>Mimikyu</h3>
+            <p>Cada ilustración de esta página está dibujada en SVG: vectores hechos a mano, capa sobre capa, igual que
+              el propio disfraz de Mimikyu.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <p>EXCAVACIÓN — Proyecto de práctica. Página de un solo archivo: HTML, CSS y JS en línea, Mimikyus en SVG.</p>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+      // 1) Resaltar en la regla de profundidad qué capa estamos atravesando
+      var secciones = document.querySelectorAll('main section[id]');
+      var enlaces = document.querySelectorAll('.depth-rule a');
+
+      function marcarActivo() {
+        var posicionActual = window.scrollY + window.innerHeight / 2;
+        var idActual = null;
+
+        secciones.forEach(function (seccion) {
+          var inicio = seccion.offsetTop;
+          var fin = inicio + seccion.offsetHeight;
+          if (posicionActual >= inicio && posicionActual < fin) {
+            idActual = seccion.getAttribute('id');
+          }
+        });
+
+        enlaces.forEach(function (enlace) {
+          var destino = enlace.getAttribute('href').replace('#', '');
+          if (destino === idActual) {
+            enlace.classList.add('is-active');
+          } else {
+            enlace.classList.remove('is-active');
+          }
+        });
+      }
+
+      window.addEventListener('scroll', marcarActivo);
+      marcarActivo();
+
+      // 2) Pequeño efecto de profundidad (parallax sutil) en el hero
+      var heroArt = document.querySelector('.hero-art');
+      if (heroArt) {
+        window.addEventListener('scroll', function () {
+          var despl = window.scrollY * 0.2;
+          heroArt.style.transform = 'translateY(' + despl + 'px)';
+        });
+      }
+
+      // 3) Revelado progresivo de las cards de crafteo al entrar en viewport
+      var cards = document.querySelectorAll('.craft-card');
+      if ('IntersectionObserver' in window) {
+        var observer = new IntersectionObserver(function (entradas) {
+          entradas.forEach(function (entrada) {
+            if (entrada.isIntersecting) {
+              entrada.target.style.opacity = '1';
+              entrada.target.style.transform = 'translateY(0)';
+            }
+          });
+        }, { threshold: 0.2 });
+
+        cards.forEach(function (card) {
+          card.style.opacity = '0';
+          card.style.transform = 'translateY(18px)';
+          card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+          observer.observe(card);
+        });
+      }
+
+    });
+  </script>
+</body>
+
+</html>
